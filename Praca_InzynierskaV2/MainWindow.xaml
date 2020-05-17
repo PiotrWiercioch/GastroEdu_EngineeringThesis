@@ -1,0 +1,960 @@
+﻿<Window x:Class="Praca_InzynierskaV2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Praca_InzynierskaV2"
+        mc:Ignorable="d"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        x:Name="AppWindow"
+        MinWidth="{Binding WindowMinimumWidth}"
+        MinHeight="{Binding WindowMinimumHeight}"
+        Height="645" Width="1200">
+
+    <Window.Resources>
+        <Style TargetType="{x:Type local:MainWindow}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Window}">
+                        <!-- Outer border with the dropshadow margin -->
+                        <Border Padding="{Binding OuterMarginSizeThickness, FallbackValue=10}">
+
+                            <!-- Main window outline -->
+                            <Grid>
+
+                                <!-- Opacity mask for corners on grid -->
+                                <Border x:Name="Container"
+                                        Background="{StaticResource BackgroundLightBrush}"
+                                        CornerRadius="{Binding WindowCornerRadius, FallbackValue=10}" />
+
+                                <!-- Window border and dropshadown -->
+                                <Border CornerRadius="{Binding WindowCornerRadius, FallbackValue=10}"
+                                    Background="{Binding ForegroundLightBrush, FallbackValue=#EBEBEB}">
+                                    <Border.Effect>
+                                        <DropShadowEffect ShadowDepth="0" Opacity="0.2" />
+                                    </Border.Effect>
+                                </Border>
+
+                                <!-- The main window content -->
+                                <Grid>
+
+                                    <!-- Corner clipping -->
+                                    <Grid.OpacityMask>
+                                        <VisualBrush Visual="{Binding ElementName=Container}" />
+                                    </Grid.OpacityMask>
+
+                                    <Grid.RowDefinitions>
+
+                                        <!-- Title Bar -->
+                                        <RowDefinition Height="{Binding TitleHeightGridLength, FallbackValue=42}" />
+
+                                        <!-- Window Content -->
+                                        <RowDefinition Height="*" />
+
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Title Bar -->
+                                    <Grid Grid.Column="0" Panel.ZIndex="1">
+
+                                        <Grid.ColumnDefinitions>
+                                            <!-- Icon -->
+                                            <ColumnDefinition Width="Auto" />
+                                            <!-- Title -->
+                                            <ColumnDefinition Width="*" />
+                                            <!-- Windows Button -->
+                                            <ColumnDefinition Width="Auto" />
+
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Icon -->
+                                        <Image Source="/Images/gastroedu2.png" Margin="30,10,5,0"/>
+
+                                        <!-- Title -->
+                                        <Viewbox Grid.Column="0" Grid.ColumnSpan="3" Margin="0">
+                                            <TextBlock Style="{StaticResource HeaderText}" Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Title}" />
+                                        </Viewbox>
+
+                                        <!-- Window Buttons -->
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                            <Button Command="{Binding MinimizeCommand}" Style="{StaticResource WindowMinButton}" Content="_" />
+                                            <Button Command="{Binding MaximizeCommand}" Style="{StaticResource WindowMaxButton}" Content="[ ]" />
+                                            <Button Command="{Binding CloseCommand}" Style="{StaticResource WindowCloseButton}" Content="X" />
+                                        </StackPanel>
+
+                                    </Grid>
+
+                                    <!-- Page Content -->
+                                    <Border Grid.Row="1" Padding="{Binding InnerContentPadding}">
+                                        <ContentPresenter Content="{TemplateBinding Content}" />
+                                    </Border>
+
+                                </Grid>
+
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome
+            ResizeBorderThickness="{Binding ResizeBorderThickness}"
+            CaptionHeight="{Binding TitleHeight}"
+            CornerRadius="0"
+            GlassFrameThickness="0"
+            />
+    </WindowChrome.WindowChrome>
+
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!--Menu-->
+        <DockPanel Grid.Column="0" Background="#EBEBEB" HorizontalAlignment="Left" Margin="0,-1,0,0" LastChildFill="False">
+            <Rectangle DockPanel.Dock="Top" Height="30"/>
+            <Button DockPanel.Dock="Top" Content="RAPORTY" Style="{StaticResource MenuButton}" Click="Button_Raporty" />
+            <Button DockPanel.Dock="Top" Content="ZESTAWIENIA" Style="{StaticResource MenuButton}" Click="Button_Zestawienia" />
+            <Button DockPanel.Dock="Top" Content="MAGAZYN" Style="{StaticResource MenuButton}" Click="Button_Magazyn" />
+            <Button DockPanel.Dock="Top" Content="KARTOTEKI" Style="{StaticResource MenuButton}" Click="Button_Kartoteki" />
+            <Button DockPanel.Dock="Top" Content="FAKTURY" Style="{StaticResource MenuButton}" Click="Button_Faktury" />
+            <Button DockPanel.Dock="Top" Content="DOSTAWCY" Style="{StaticResource MenuButton}" Click="Button_Dostawcy"  />
+            <Grid Height="auto" DockPanel.Dock="Bottom">
+                <Image DockPanel.Dock="Bottom" Source="Images/tlo.png" Stretch="None" Width="190" Height="auto" MinHeight="309"/>
+                <Button x:Name="InfoButton" Content="?" Style="{StaticResource InfoButton}" Click="InfoButton_Click"/>
+            </Grid>
+        </DockPanel>
+
+        <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <TabControl x:Name="Zakladki" BorderThickness="0">
+                
+                <!--Strona startowa-->
+                <TabItem TabIndex="0" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="50"/>
+                            <RowDefinition Height="50"/>
+                            <RowDefinition Height="50"/>
+                            <RowDefinition Height="50"/>
+                            <RowDefinition Height="50"/>
+                            <RowDefinition Height="50"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Row="1" Grid.Column="0" Content="&#129092; STWÓRZ RAPORT &#9317;" Style="{StaticResource LabelStyleText}" FontSize="14" Width="auto" Height="50" VerticalContentAlignment="Center"/>
+                        <Label Grid.Row="2" Grid.Column="0" Content="&#129092; STWÓRZ/SPRAWDŹ WYBRANE ZESTAWIENIA &#9316;" Style="{StaticResource LabelStyleText}" FontSize="14" Width="auto" Height="50" VerticalContentAlignment="Center"/>
+                        <Label Grid.Row="3" Grid.Column="0" Content="&#129092; ZAKTUALIZUJ STAN MAGAZYNU &#9315;" Style="{StaticResource LabelStyleText}" FontSize="14" Width="auto" Height="50" VerticalContentAlignment="Center"/>
+                        <Label Grid.Row="4" Grid.Column="0" Content="&#129092; STWÓRZ KARTOTEKĘ &#9314;" Style="{StaticResource LabelStyleText}" FontSize="14" Width="auto" Height="50" VerticalContentAlignment="Center"/>
+                        <Label Grid.Row="5" Grid.Column="0" Content="&#129092; DODAJ FAKTURE &#9313;" Style="{StaticResource LabelStyleText}" FontSize="14" Width="auto" Height="50" VerticalContentAlignment="Center"/>
+                        <Label Grid.Row="6" Grid.Column="0" Content="&#129092; DODAJ DOSTAWCE &#9312;" Style="{StaticResource LabelStyleText}" FontSize="14" Width="auto" Height="50" VerticalContentAlignment="Center"/>
+
+                        <Image Grid.Row="7" Grid.Column="1" Source="/Images/gastroedu2.png" Width="200" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="50"/>
+
+                        <Grid Grid.Row="7" Grid.Column="0" Width="300" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <DockPanel Grid.Column="0">
+                                <Label DockPanel.Dock="Top" Content="Kontakt" Style="{StaticResource LabelStyleText}" FontSize="16" Width="auto" Height="30" HorizontalAlignment="Center"/>
+                                <Label DockPanel.Dock="Top" Content="E-mail: p.j.wiercioch@gmail.com" Style="{StaticResource LabelStyleText}" FontSize="12" Width="auto" Height="27" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <Label DockPanel.Dock="Bottom" Content="Tel.: 785 109 917" Style="{StaticResource LabelStyleText}" FontSize="12" Width="auto" Height="27" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </DockPanel>
+                            <DockPanel Grid.Column="2">
+                                <Label DockPanel.Dock="Top" Content="Wersja" Style="{StaticResource LabelStyleText}" FontSize="16" Width="auto" Height="30" HorizontalAlignment="Center"/>
+                                <Label DockPanel.Dock="Top" Content="1.1v" Style="{StaticResource LabelStyleText}" FontSize="12" Width="auto" Height="27" HorizontalAlignment="Center"/>
+                                <Label DockPanel.Dock="Top" Content=" " Style="{StaticResource LabelStyleText}" FontSize="12" Width="auto" Height="27" HorizontalAlignment="Center"/>
+                            </DockPanel>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+
+                <!--Dostawcy-->
+                <TabItem TabIndex="2" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="280"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="20"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                            </Grid.RowDefinitions>
+                                <Label Grid.Row="0" Grid.Column="1" Content="NAZWA" Style="{StaticResource LabelStyleText}" Width="auto" Height="25"/>
+                                <Label Grid.Row="1" Grid.Column="1" Content="NIP" Style="{StaticResource LabelStyleText}"  Width="auto" Height="25"/>
+                                <Label Grid.Row="2" Grid.Column="1" Content="MIEJSCOWOŚĆ" Style="{StaticResource LabelStyleText}" Width="auto" Height="25" />
+                                <Label Grid.Row="3" Grid.Column="1" Content="ULICA" Style="{StaticResource LabelStyleText}" Width="auto" Height="25"/>
+                                <Label Grid.Row="4" Grid.Column="1" Content="NR. DOMU" Style="{StaticResource LabelStyleText}" Width="auto" Height="25"/>
+                                <Label Grid.Row="5" Grid.Column="1" Content="NR. TEL." Style="{StaticResource LabelStyleText}" Width="auto" Height="25"/>
+                                <Label Grid.Row="6" Grid.Column="1" Content="Nr. KONTA" Style="{StaticResource LabelStyleText}" Width="auto" Height="25"/>
+                                <Label Grid.Row="8" Grid.Column="1" Content="SZUKAJ" Style="{StaticResource LabelStyleText}" Width="auto" Height="25"/>
+
+                                <TextBox x:Name="txtId" Visibility="Collapsed"/>
+                                <TextBox Grid.Row="0" Grid.Column="2" x:Name="txtNazwa" TextWrapping="NoWrap" Width="450" Height="25" Style="{StaticResource NiceTextBox}"/>
+                                <TextBox Grid.Row="1" Grid.Column="2" x:Name="txtNip" TextWrapping="NoWrap" Width="450" Height="25" Style="{StaticResource NiceTextBox}"/>
+                                <TextBox Grid.Row="2" Grid.Column="2" x:Name="txtMiejscowosc" TextWrapping="NoWrap" Width="450" Height="25" Style="{StaticResource NiceTextBox}"/>
+                                <TextBox Grid.Row="3" Grid.Column="2" x:Name="txtUlica" TextWrapping="NoWrap" Width="450" Height="25" Style="{StaticResource NiceTextBox}"/>
+                                <TextBox Grid.Row="4" Grid.Column="2" x:Name="txtNr_domu" TextWrapping="NoWrap" Width="450" Height="25" Style="{StaticResource NiceTextBox}"/>
+                                <TextBox Grid.Row="5" Grid.Column="2" x:Name="txtNr_tel" TextWrapping="NoWrap" Width="450" Height="25" Style="{StaticResource NiceTextBox}" PreviewTextInput="TxtNr_tel_PreviewTextInput"/>
+                                <TextBox Grid.Row="6" Grid.Column="2" x:Name="txtNr_konta" TextWrapping="NoWrap" Width="450" Height="25" Style="{StaticResource NiceTextBox}" PreviewTextInput="TxtNr_konta_PreviewTextInput"/>
+                                <TextBox Grid.Row="8" Grid.Column="2" x:Name="txtSzukaj" TextWrapping="NoWrap" Width="450" Height="25" TextChanged="TxtSzukaj_TextChanged" Style="{StaticResource NiceTextBox}"/>
+
+                            </Grid>
+                            <Grid Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                </Grid.RowDefinitions>
+                                <Button Grid.Column="1" Grid.Row="3" x:Name="btnDodajProvider" Content="DODAJ" Style="{StaticResource AddButton}" Click="BtnDodajProvider_Click" Width="120"/>
+                                <Button Grid.Column="1" Grid.Row="4" x:Name="btnEdytujProvider" Content="EDYTUJ" Style="{StaticResource EditButton}" Click="BtnEdytujProvider_Click" Width="120"/>
+                                <Button Grid.Column="1" Grid.Row="5" x:Name="btnUsunProvider" Content="USUŃ" Style="{StaticResource DeleteButton}" Click="BtnUsunProvider_Click" Width="120"/>
+                                <Button Content="WYCZYŚĆ POLA" Grid.Row="6" Grid.Column="1" Width="120" Click="BtnWyczyscProvider_Click" Style="{StaticResource ClearButton}" />
+
+
+                            </Grid>
+
+                                <Grid Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                                    <Grid.RowDefinitions>
+                                     <RowDefinition Height="30"/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Image Grid.Row="1" Source="/Images/gastroedu2.png" Width="230" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                <Label Grid.Row="2" Content="DOSTAWCY" Style="{StaticResource LabelStyleText}" Width="auto" HorizontalAlignment="Center" FontSize="20"/>
+                            </Grid>
+                        </Grid>
+
+                        <DataGrid Grid.Row="2" Name="DataGridProvider" Height="410" Width="auto" Margin="20,20,20,10" SelectionChanged="DataGridProvider_SelectionChanged" ItemsSource="{Binding Path=LoadDataBinding}" AutoGenerateColumns="False" IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Id" Binding="{Binding id_provider}" Visibility="Collapsed"></DataGridTextColumn>
+                                <DataGridTextColumn Width="130" Header="Nazwa" Binding="{Binding name_provider}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="110" Header="NIP" Binding="{Binding nip}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="110" Header="Miejscowość" Binding="{Binding city}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="110" Header="Ulica" Binding="{Binding street}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="110" Header="Numer domu" Binding="{Binding houseNumber}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="110" Header="Numer telefonu" Binding="{Binding phoneNumber}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="110" Header="Konto bankowe" Binding="{Binding bankAccount}"></DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                    </Grid>
+                </TabItem>
+
+                <!--Faktury-->
+                <TabItem TabIndex="3" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="210"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="20"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" Grid.Column="1" Content="NUMER FAKTURY" Style="{StaticResource LabelStyleText}" Width="auto" Height="25"/>
+                                <Label Grid.Row="1" Grid.Column="1" Content="WARTOŚĆ NETTO" Style="{StaticResource LabelStyleText}"  Width="auto" Height="25"/>
+                                <Label Grid.Row="2" Grid.Column="1" Content="WARTOŚĆ BRUTTO" Style="{StaticResource LabelStyleText}" Width="auto" Height="25" />
+                                <Label Grid.Row="3" Grid.Column="1" Content="DATA FAKTURY" Style="{StaticResource LabelStyleText}" Width="auto" Height="25"/>
+                                <Label Grid.Row="4" Grid.Column="1" Content="SKRÓT FAKTURY" Style="{StaticResource LabelStyleText}" Width="auto" Height="25"/>
+                                <Label Grid.Row="6" Grid.Column="1" Content="SZUKAJ" Style="{StaticResource LabelStyleText}" Width="auto" Height="25"/>
+
+                                <TextBox Grid.Row="0" Grid.Column="2" x:Name="txtId_invoice" Width="150" Height="25" Visibility="Collapsed"/>
+                                <TextBox Grid.Row="0" Grid.Column="2" x:Name="txtNumer_faktury" TextWrapping="NoWrap" Width="150" Height="25" HorizontalAlignment="Left" Style="{StaticResource NiceTextBox}"/>
+                                <TextBox Grid.Row="1" Grid.Column="2" x:Name="txtWartosc_netto" TextWrapping="NoWrap" Width="150" Height="25" HorizontalAlignment="Left" Style="{StaticResource NiceTextBox}" PreviewTextInput="TxtWartosc_netto_PreviewTextInput"/>
+                                <TextBox Grid.Row="2" Grid.Column="2" x:Name="txtWartosc_brutto" TextWrapping="NoWrap" Width="150" Height="25" HorizontalAlignment="Left" Style="{StaticResource NiceTextBox}" PreviewTextInput="TxtWartosc_brutto_PreviewTextInput"/>
+                                <DatePicker Grid.Row="3" Grid.Column="2" x:Name="DatePickerInvoice" Width="150" Height="25">
+                                    <DatePicker.Style>
+                                        <Style TargetType="{x:Type DatePicker}">
+                                            <Setter Property="Foreground" Value="{StaticResource ForegroundMainBrush}" />
+                                            <Setter Property="FontFamily" Value="{StaticResource LatoRegular}" />
+                                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                                            <Setter Property="HorizontalAlignment" Value="Left" />
+                                        </Style>
+                                    </DatePicker.Style>
+                                </DatePicker>
+                                <TextBox Grid.Row="4" Grid.Column="2" x:Name="txtSkrot_faktury" TextWrapping="NoWrap" Width="150" Height="25" HorizontalAlignment="Left" Style="{StaticResource NiceTextBox}"/>
+
+                                <TextBox Grid.Row="6" Grid.Column="2" x:Name="txtSzukaj_Invoice" TextWrapping="NoWrap" Width="450" Height="25" TextChanged="TxtSzukaj_Invoice_TextChanged" Style="{StaticResource NiceTextBox}"/>
+                            </Grid>
+                            <Grid Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                </Grid.RowDefinitions>
+                                <Button Grid.Column="1" Grid.Row="1" x:Name="btnDodaj_Invoice" Content="DODAJ" Style="{StaticResource AddButton}" Click="BtnDodaj_Invoice_Click" Width="120"/>
+                                <Button Grid.Column="1" Grid.Row="2" x:Name="btnEdytuj_Invoice" Content="EDYTUJ" Style="{StaticResource EditButton}" Click="BtnEdytuj_Invoice_Click" Width="120"/>
+                                <Button Grid.Column="1" Grid.Row="3" x:Name="btnUsun_Invoice" Content="USUŃ" Style="{StaticResource DeleteButton}" Click="BtnUsun_Invoice_Click" Width="120"/>
+                                <Button Content="WYCZYŚĆ POLA" Grid.Row="4" Grid.Column="1" Width="120" Click="BtnWyczysc_Invoice_Click" Style="{StaticResource ClearButton}" />
+
+
+                            </Grid>
+
+                            <Grid Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Image Grid.Row="1" Source="/Images/gastroedu2.png" Width="230" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                <Label Grid.Row="2" Content="FAKTURY" Style="{StaticResource LabelStyleText}" Width="auto" HorizontalAlignment="Center" FontSize="20"/>
+                            </Grid>
+                        </Grid>
+
+                        <DataGrid Grid.Row="2" x:Name="DataGridInvoice" Height="480" MinHeight="480" Width="auto" Margin="20,20,20,10" SelectionChanged="DataGridInvoice_SelectionChanged" ItemsSource="{Binding Path=LoadDataBinding}" AutoGenerateColumns="False" IsReadOnly="True">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="ContentTemplate">
+                                        <Setter.Value>
+                                            <DataTemplate>
+                                                <TextBlock TextWrapping="Wrap" Text="{Binding}" FontSize="9"></TextBlock>
+                                            </DataTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="id_invoice" Binding="{Binding id_invoice}" Visibility="Collapsed"></DataGridTextColumn>
+                                <DataGridTextColumn Width="110" Header="NUMER FAKTURY" Binding="{Binding name_invoice}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="110" Header="WARTOŚĆ NETTO" Binding="{Binding net_amount_invoice,StringFormat={}{0:0.##}}" ></DataGridTextColumn>
+                                <DataGridTextColumn Width="110" Header="WARTOŚĆ BRUTTO" Binding="{Binding gross_amount_invoice,StringFormat={}{0:0.##}}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="110" Header="DATA" Binding="{Binding date_invoice, StringFormat=\{0:dd.MM.yyyy\}}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="110" Header="SKRÓT FAKTURY" Binding="{Binding shortcut_name_invoice}"></DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                    </Grid>
+
+                </TabItem>
+
+                <!--Raporty-->
+                <TabItem TabIndex="4" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition MinWidth="20" Width="*"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition MinWidth="20" Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="1" Grid.Row="1" Background="#FF464646" CornerRadius="10">
+                            <Border Background="White" CornerRadius="5" Margin="10">
+                                <StackPanel Margin="50">
+                                    <Label Content="WYBIERZ DATĘ RAPORTU:" Style="{StaticResource LabelStyleText}" Width="auto" Height="25" HorizontalAlignment="Center" />
+                                    <DatePicker x:Name="DatePickerReport" Width="150" Height="25" HorizontalAlignment="Center" >
+                                        <DatePicker.Style>
+                                            <Style TargetType="{x:Type DatePicker}">
+                                                <Setter Property="Foreground" Value="{StaticResource ForegroundMainBrush}" />
+                                                <Setter Property="FontFamily" Value="{StaticResource LatoRegular}" />
+                                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                                                <Setter Property="HorizontalAlignment" Value="Left" />
+                                            </Style>
+                                        </DatePicker.Style>
+                                    </DatePicker>
+                                    <Separator Margin="0 30"></Separator>
+                                    <Button Content="GENERUJ RAPORT" FontSize="35"  Click="Test_Click" Style="{StaticResource ReportButton}"/>
+                                </StackPanel>
+                            </Border>
+                        </Border>
+                    </Grid>
+                </TabItem>
+
+                <!--Kartoteki-->
+                <TabItem TabIndex="5" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="260"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="20"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" Grid.Column="1" Content="INDEKS KARTOTEKI" Style="{StaticResource LabelStyleText}" Width="auto" Height="25"/>
+                                <Label Grid.Row="1" Grid.Column="1" Content="NAZWA" Style="{StaticResource LabelStyleText}"  Width="auto" Height="25"/>
+                                <Label Grid.Row="2" Grid.Column="1" Content="CENA" Style="{StaticResource LabelStyleText}" Width="auto" Height="25" />
+                                <Label Grid.Row="3" Grid.Column="1" Content="JEDNOSTKA MIARY" Style="{StaticResource LabelStyleText}" Width="auto" Height="25"/>
+                                <Label Grid.Row="4" Grid.Column="1" Content="DOSTAWCA" Style="{StaticResource LabelStyleText}" Width="auto" Height="25"/>
+                                <Label Grid.Row="5" Grid.Column="1" Content="STAN POCZĄTKOWY" Style="{StaticResource LabelStyleText}" VerticalAlignment="Top" Width="auto" Height="25"/>
+                                <Label Grid.Row="7" Grid.Column="1" Content="SZUKAJ" Style="{StaticResource LabelStyleText}" Width="auto" Height="25"/>
+
+                                <TextBox x:Name="txtId_CI" Visibility="Collapsed"/>
+                                <TextBox Grid.Row="0" Grid.Column="2" x:Name="txtIKartoteki_CI" TextWrapping="NoWrap" Width="450" Height="25" Style="{StaticResource NiceTextBox}"/>
+                                <TextBox Grid.Row="1" Grid.Column="2" x:Name="txtNazwa_CI" TextWrapping="NoWrap" Width="450" Height="25" Style="{StaticResource NiceTextBox}"/>
+                                <TextBox Grid.Row="2" Grid.Column="2" x:Name="txtCena_CI" TextWrapping="NoWrap" Width="450" Height="25" Style="{StaticResource NiceTextBox}" PreviewTextInput="TxtCena_CI_PreviewTextInput"/>
+                                <ComboBox Grid.Row="3" Grid.Column="2" x:Name="cbbJMiary_CI" Width="100" Height="25" HorizontalAlignment="Left">
+                                    <ComboBoxItem Content="Kg."/>
+                                    <ComboBoxItem Content="L."/>
+                                    <ComboBoxItem Content="Szt."/>
+                                </ComboBox>
+                                <ComboBox x:Name="cbbProvider" Grid.Row="4" Grid.Column="2" Width="auto" MinWidth="100" Height="25" HorizontalAlignment="Left">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Margin="2" Text="{Binding id_provider}" Visibility="Collapsed"></TextBlock>
+                                                <TextBlock Margin="2" Text="{Binding name_provider}"/>
+                                                <TextBlock Margin="2" Text="{Binding nip}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <TextBox Grid.Row="4" Grid.Column="2" x:Name="txt_id_cbbSupp" Text="{Binding ElementName = cbbProvider, Path=SelectedValue}" Visibility="Collapsed" Width="450" Height="25"/>
+                                <TextBox Grid.Row="5" Grid.Column="2" x:Name="txtStan_poczatkowy_inv" TextWrapping="NoWrap" Width="100" Height="25" HorizontalAlignment="Left" Style="{StaticResource NiceTextBox}" PreviewTextInput="TxtStan_poczatkowy_inv_PreviewTextInput"/>
+                                <TextBox Grid.Row="7" Grid.Column="2" x:Name="txtSzukaj_CI" TextWrapping="NoWrap" Width="450" Height="25" TextChanged="TxtSzukaj_CI_TextChanged" Style="{StaticResource NiceTextBox}"/>
+
+                            </Grid>
+                            <Grid Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                </Grid.RowDefinitions>
+                                <Button Grid.Column="1" Grid.Row="2" x:Name="btnDodaj_CI" Content="DODAJ" Style="{StaticResource AddButton}" Click="BtnDodajCI_Click" Width="120"/>
+                                <Button Grid.Column="1" Grid.Row="3" x:Name="btnEdytuj_CI" Content="EDYTUJ" Style="{StaticResource EditButton}" Click="BtnEdytujCI_Click" Width="120"/>
+                                <Button Grid.Column="1" Grid.Row="4" x:Name="btnUsun_CI" Content="USUŃ" Style="{StaticResource DeleteButton}" Click="BtnUsunCI_Click" Width="120"/>
+                                <Button Content="WYCZYŚĆ POLA" Grid.Row="5" Grid.Column="1" Width="120" Click="BtnWyczyscCI_Click" Style="{StaticResource ClearButton}" />
+
+
+                            </Grid>
+
+                            <Grid Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Image Grid.Row="1" Source="/Images/gastroedu2.png" Width="230" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                <Label Grid.Row="2" Content="KARTOTEKI" Style="{StaticResource LabelStyleText}" Width="auto" HorizontalAlignment="Center" FontSize="20"/>
+                            </Grid>
+                        </Grid>
+
+                        <DataGrid Grid.Row="2" x:Name="DataGridCardIndex" Height="430" Width="auto" Margin="20,20,20,10" SelectionChanged="DataGridCardIndex_SelectionChanged" ItemsSource="{Binding Path=LoadDataBinding}" AutoGenerateColumns="False" IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Id" Binding="{Binding id}" Visibility="Collapsed"></DataGridTextColumn>
+                                <DataGridTextColumn Width="130" Header="INDEKS KARTOTEKI" Binding="{Binding file}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="110" Header="NAZWA" Binding="{Binding name}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="110" Header="CENA" Binding="{Binding price,StringFormat={}{0:0.##}}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="130" Header="JEDNOSTKA MIARY" Binding="{Binding unit}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="130" Header="STAN POCZĄTKOWY" Binding="{Binding total_quantity_inventory,StringFormat={}{0:0.###}}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="130" Header="ID DOSTAWCY" Binding="{Binding id_provider}" Visibility="Collapsed"></DataGridTextColumn>
+                                <DataGridTextColumn Width="130" Header="DOSTAWCA" Binding="{Binding name_provider}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="130" Header="NIP DOSTAWCY" Binding="{Binding nip}"></DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                    </Grid>
+
+                </TabItem>
+
+                <!--Magazyn-->
+                <TabItem TabIndex="6" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="235"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="20"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="110"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="55"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" Grid.Column="1" Content="PRODUKT" Style="{StaticResource LabelStyleText}" Width="auto" Height="25"/>
+                                <Label Grid.Row="1" Grid.Column="1" Content="PRZYCHÓD" Style="{StaticResource LabelStyleText}"  Width="auto" Height="25"/>
+                                <Label Grid.Row="2" Grid.Column="1" Content="ROZCHÓD" Style="{StaticResource LabelStyleText}" Width="auto" Height="25" />
+                                <Label Grid.Row="3" Grid.Column="1" Content="DATA" Style="{StaticResource LabelStyleText}" Width="auto" Height="25"/>
+                                <Label Grid.Row="4" Grid.Column="1" Content="SKRÓT FAKTURY" Style="{StaticResource LabelStyleText}" Width="auto" Height="25"/>
+                                <Label Grid.Row="6" Grid.Column="1" Content="SZUKAJ" Style="{StaticResource LabelStyleText}" Width="auto" Height="25"/>
+                                <Label Grid.Row="0" Grid.Column="2" Content="STAN WYBRANEGO PRODUKTU:" Style="{StaticResource LabelStyleText}" Width="auto" Height="25" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+
+                                <TextBox Grid.Row="0" Grid.Column="2" x:Name="txtId_inventory" Width="150" Height="25" Visibility="Collapsed"/>
+                                <TextBox Grid.Row="0" Grid.Column="2" x:Name="txtId_ci_index" Text="{Binding ElementName = cbbFile, Path=SelectedValue}"  Width="150" Height="25" Visibility="Collapsed" TextChanged="TxtId_ci_index_TextChanged"/>
+                                <TextBox Grid.Row="0" Grid.Column="2" x:Name="txtId_invoice_index" Text="{Binding ElementName = cbb_shortcut_name_invoice, Path=SelectedValue}"  Width="150" Height="25" Visibility="Collapsed"/>
+                                <TextBlock Grid.Row="1" Grid.Column="2" x:Name="txtTotall_quantity" Text="0" Width="70" Height="25" Visibility="Visible" VerticalAlignment="Center" HorizontalAlignment="Right" Style="{StaticResource HeaderText}" Margin="0,0,10,0" FontSize="16" TextAlignment="Right"/>
+                                <ComboBox x:Name="cbbFile" Grid.Row="0" Grid.Column="2" Width="auto" MinWidth="80" Height="25" HorizontalAlignment="Left" Style="{StaticResource NiceComboBox}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Margin="2" Text="{Binding id}" Visibility="Collapsed"/>
+                                                <TextBlock Margin="2" Text="{Binding file}"/>
+                                                <TextBlock Margin="2" Text="{Binding name}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <TextBox Grid.Row="1" Grid.Column="2" x:Name="txtPrzychod_inv" TextWrapping="NoWrap" Width="150" Height="25" HorizontalAlignment="Left" Style="{StaticResource NiceTextBox}" PreviewTextInput="TxtPrzychod_inv_PreviewTextInput"/>
+                                <TextBox Grid.Row="2" Grid.Column="2" x:Name="txtRozchod_inv" TextWrapping="NoWrap" Width="150" Height="25" HorizontalAlignment="Left" Style="{StaticResource NiceTextBox}" PreviewTextInput="TxtRozchod_inv_PreviewTextInput"/>
+                                <StackPanel Grid.Row="3" Grid.Column="2" Orientation="Vertical" Margin="0,5,0,0">
+                                    <RadioButton x:Name="AutomaticDateRadioButton" Height="25" HorizontalAlignment="Left" VerticalAlignment="Bottom" IsChecked="True" Style="{StaticResource NiceRadioButton}">
+                                        <TextBlock>
+                                            <TextBlock.Style>
+                                                <Style TargetType="{x:Type TextBlock}">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Setter Property="Foreground" Value="#FF3E3E3E"/>
+                                                    <Setter Property="Margin" Value="3,0,0,0"/>
+                                                    <Setter Property="FontSize" Value="12"/>
+                                                </Style>
+                                            </TextBlock.Style>
+                                            DATA AUTOMATYCZNA
+                                        </TextBlock>
+                                    </RadioButton>
+                                    <RadioButton x:Name="ManualDateRadioButton" Height="25" HorizontalAlignment="Left" VerticalAlignment="Bottom" Style="{StaticResource NiceRadioButton}">
+                                        <RadioButton.Content>
+                                            <StackPanel>
+                                                <TextBlock>
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="{x:Type TextBlock}">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                            <Setter Property="Foreground" Value="#FF3E3E3E"/>
+                                                            <Setter Property="Margin" Value="3,0,0,0"/>
+                                                            <Setter Property="FontSize" Value="12"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding ElementName=ManualDateRadioButton, Path=IsChecked}" Value="True">
+                                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                    USTAW RĘCZNIE DATĘ
+                                                </TextBlock>
+                                                <DatePicker x:Name="DatePickerManual">
+                                                    <DatePicker.Style>
+                                                        <Style TargetType="{x:Type DatePicker}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Setter Property="Margin" Value="3,0,0,0"/>
+                                                            <Setter Property="Foreground" Value="{StaticResource ForegroundMainBrush}" />
+                                                            <Setter Property="FontFamily" Value="{StaticResource LatoRegular}" />
+                                                            <Setter Property="VerticalContentAlignment" Value="Center" />
+
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding ElementName=ManualDateRadioButton, Path=IsChecked}" Value="True">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </DatePicker.Style>
+                                                </DatePicker>
+                                            </StackPanel>
+                                        </RadioButton.Content>
+                                    </RadioButton>
+                                </StackPanel>
+                                <ComboBox x:Name="cbb_shortcut_name_invoice" Grid.Row="4" Grid.Column="2" Width="auto" MinWidth="80" Height="25" HorizontalAlignment="Left" Style="{StaticResource NiceComboBox}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Margin="2" Text="{Binding id_invoice}" Visibility="Collapsed"/>
+                                                <TextBlock Margin="2" Text="{Binding shortcut_name_invoice}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <TextBox Grid.Row="6" Grid.Column="2" x:Name="txtSzukaj_Inv" TextWrapping="NoWrap" Width="450" Height="25" TextChanged="TxtSzukaj_Inv_TextChanged" Style="{StaticResource NiceTextBox}"/>
+                            </Grid>
+                            <Grid Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="55"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                </Grid.RowDefinitions>
+                                <Button Grid.Column="1" Grid.Row="1" x:Name="btnDodaj_Inventory" Content="DODAJ" Style="{StaticResource AddButton}" Click="BtnDodaj_Inventory_Click" Width="120"/>
+                                <Button Grid.Column="1" Grid.Row="2" x:Name="btnEdytuj_Inventory" Content="EDYTUJ" Style="{StaticResource EditButton}" Click="BtnEdytuj_Inventory_Click" Width="120"/>
+                                <Button Grid.Column="1" Grid.Row="3" x:Name="btnUsun_Inventory" Content="USUŃ" Style="{StaticResource DeleteButton}" Click="BtnUsun_Inventory_Click" Width="120"/>
+                                <Button Content="WYCZYŚĆ POLA" Grid.Row="4" Grid.Column="1" Width="120" Click="BtnWyczysc_Inventory_Click" Style="{StaticResource ClearButton}"/>
+
+
+                            </Grid>
+
+                            <Grid Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Image Grid.Row="1" Source="/Images/gastroedu2.png" Width="230" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                <Label Grid.Row="2" Content="MAGAZYN" Style="{StaticResource LabelStyleText}" Width="auto" HorizontalAlignment="Center" FontSize="20"/>
+                            </Grid>
+                        </Grid>
+
+                        <DataGrid Grid.Row="2" x:Name="DataGridInventory" Height="450" MinHeight="410" Width="auto" Margin="20,20,20,10" SelectionChanged="DataGridInventory_SelectionChanged" ItemsSource="{Binding Path=LoadDataBinding}" AutoGenerateColumns="False" IsReadOnly="True">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="ContentTemplate">
+                                        <Setter.Value>
+                                            <DataTemplate>
+                                                <TextBlock TextWrapping="Wrap" Text="{Binding}" FontSize="9"></TextBlock>
+                                            </DataTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="id_inventory" Binding="{Binding id_inventory}" Visibility="Collapsed"></DataGridTextColumn>
+                                <DataGridTextColumn Header="Id_ci_index" Binding="{Binding id_ci_index}" Visibility="Collapsed"></DataGridTextColumn>
+                                <DataGridTextColumn Header="Id_invoice_index" Binding="{Binding id_invoice_index}" Visibility="Collapsed"></DataGridTextColumn>
+                                <DataGridTextColumn Width="50" Header="INDEKS" Binding="{Binding file}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="80" Header="NAZWA" Binding="{Binding name}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="80" Header="PRZYCHÓD" Binding="{Binding income_inventory,StringFormat={}{0:0.###}}" ></DataGridTextColumn>
+                                <DataGridTextColumn Width="80" Header="ROZCHÓD" Binding="{Binding expenditure_inventory,StringFormat={}{0:0.###}}" ></DataGridTextColumn>
+                                <DataGridTextColumn Width="100" Header="STAN AKTUALNY" Binding="{Binding total_after,StringFormat={}{0:0.###}}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="90" Header="JEDNOSTKA MIARY" Binding="{Binding 	unit}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="80" Header="KWOTA STANU" Binding="{Binding total_after_price,StringFormat={}{0:n2}}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="80" Header="DATA" Binding="{Binding date_add_inventory, StringFormat=\{0:dd.MM.yyyy\}}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="80" Header="SKRÓT FAKTURY" Binding="{Binding shortcut_name_invoice}"></DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                    </Grid>
+                </TabItem>
+
+                <!--Zestawienia-->
+                <TabItem TabIndex="7" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="150"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        
+                        <Label Content="WYBIERZ DATĘ" Style="{StaticResource LabelStyleText}" FontSize="24" Width="auto" VerticalContentAlignment="Bottom" HorizontalAlignment="Center" Grid.Row="1"/>
+
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top">
+                            <Label Content="OD:" Style="{StaticResource LabelStyleText}" FontSize="16" Width="auto" Height="50" VerticalContentAlignment="Center"/>
+                            <DatePicker x:Name="DatePickerSummary1" Width="150" Height="25" HorizontalAlignment="Center">
+                                <DatePicker.Style>
+                                    <Style TargetType="{x:Type DatePicker}">
+                                        <Setter Property="Foreground" Value="{StaticResource ForegroundMainBrush}" />
+                                        <Setter Property="FontFamily" Value="{StaticResource LatoRegular}" />
+                                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                                        <Setter Property="HorizontalAlignment" Value="Left" />
+                                    </Style>
+                                </DatePicker.Style>
+                            </DatePicker>
+                            
+                            <Label Content="DO:" Style="{StaticResource LabelStyleText}" FontSize="16" Width="auto" Height="50" VerticalContentAlignment="Center"/>
+                            <DatePicker x:Name="DatePickerSummary2" Width="150" Height="25" HorizontalAlignment="Center">
+                                <DatePicker.Style>
+                                    <Style TargetType="{x:Type DatePicker}">
+                                        <Setter Property="Foreground" Value="{StaticResource ForegroundMainBrush}" />
+                                        <Setter Property="FontFamily" Value="{StaticResource LatoRegular}" />
+                                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                                        <Setter Property="HorizontalAlignment" Value="Left" />
+                                    </Style>
+                                </DatePicker.Style>
+                            </DatePicker>
+                        </StackPanel>
+                        
+                        <Grid Grid.Row="4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="50"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="50"/>
+                                </Grid.RowDefinitions>
+
+                            <Button Grid.Column="1" Grid.Row="0" FontSize="25" Style="{StaticResource ReportButton}" Click="BtnReportSummary_Click">
+                                    ZESTAWIENIE RAPORTÓW
+                                </Button>
+
+                            <Button Grid.Column="3" Grid.Row="0" FontSize="25" Style="{StaticResource ReportButton}" Click="BtnInvoiceSummary_Click">
+                                    ZESTAWIENIE FAKTUR
+                                </Button>
+
+                                <Button Grid.Column="5" Grid.Row="0" FontSize="25" Style="{StaticResource ReportButton}">
+                                    INWENTARYZACJA
+                                </Button>
+
+                            </Grid>
+                    </Grid>
+                </TabItem>
+
+                <!--Zestawienia raportow-->
+                <TabItem TabIndex="8" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="150"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="20"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <Grid Grid.Column="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Content="WRÓĆ" Grid.Column="1" Width="100" Height="50" Click="BtnBackSummary_Click" Style="{StaticResource BackButton}"/>
+                            </Grid>
+
+                            <Grid Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Content="UTWÓRZ PDF" Grid.Column="1" Width="200" Height="50" Click="BtnReportSummaryPDF_Click" Style="{StaticResource ReportButton}"/>
+                            </Grid>
+
+                            <Grid Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Image Grid.Row="1" Source="/Images/gastroedu2.png" Width="230" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                <Label Grid.Row="2" Content="ZESTAWIENIE RAPORTÓW" Style="{StaticResource LabelStyleText}" Width="auto" HorizontalAlignment="Center" FontSize="20"/>
+                            </Grid>
+                        </Grid>
+
+                        <DataGrid Grid.Row="2" x:Name="DataGridReportSummary" Height="540" MinHeight="540" Width="320" Margin="20,20,20,10" ItemsSource="{Binding Path=LoadDataBinding}" AutoGenerateColumns="False" IsReadOnly="True" HorizontalAlignment="Left">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="ContentTemplate">
+                                        <Setter.Value>
+                                            <DataTemplate>
+                                                <TextBlock TextWrapping="Wrap" Text="{Binding}" FontSize="9"></TextBlock>
+                                            </DataTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Width="110" Header="DATA" Binding="{Binding Data}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="110" Header="WARTOŚĆ RAPORTU" Binding="{Binding Wartosc1,StringFormat={}{0:0.##}}" ></DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                    </Grid>
+                </TabItem>
+
+                <!--Zestawienia faktur-->
+                <TabItem TabIndex="9" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="150"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="20"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid Grid.Column="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Content="WRÓĆ" Grid.Column="1" Width="100" Height="50" Click="BtnBackSummary_Click" Style="{StaticResource BackButton}"/>
+                            </Grid>
+
+                            <Grid Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Content="UTWÓRZ PDF" Grid.Column="1" Width="200" Height="50" Click="BtnReportSummaryPDF_Click" Style="{StaticResource ReportButton}"/>
+                            </Grid>
+
+                            <Grid Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Image Grid.Row="1" Source="/Images/gastroedu2.png" Width="230" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                <Label Grid.Row="2" Content="ZESTAWIENIE RAPORTÓW" Style="{StaticResource LabelStyleText}" Width="auto" HorizontalAlignment="Center" FontSize="20"/>
+                            </Grid>
+                        </Grid>
+
+                        <DataGrid Grid.Row="2" x:Name="DataGridInvoiceSummary" Height="540" MinHeight="540" Width="520" Margin="20,20,20,10" ItemsSource="{Binding Path=LoadDataBinding}" AutoGenerateColumns="False" IsReadOnly="True" HorizontalAlignment="Left">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="ContentTemplate">
+                                        <Setter.Value>
+                                            <DataTemplate>
+                                                <TextBlock TextWrapping="Wrap" Text="{Binding}" FontSize="9"></TextBlock>
+                                            </DataTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Width="110" Header="DATA" Binding="{Binding date_invoice, StringFormat=\{0:dd.MM.yyyy\}}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="110" Header="NUMER FAKTURY" Binding="{Binding name_invoice}"></DataGridTextColumn>
+                                <DataGridTextColumn Width="110" Header="WARTOŚĆ NETTO" Binding="{Binding net_amount_invoice,StringFormat={}{0:0.##}}" ></DataGridTextColumn>
+                                <DataGridTextColumn Width="110" Header="WARTOŚĆ BRUTTO" Binding="{Binding gross_amount_invoice,StringFormat={}{0:0.##}}"></DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                    </Grid>
+                </TabItem>
+
+                <!--Inwentaryzacja-->
+                <TabItem TabIndex="10" Visibility="Collapsed">
+                    <Grid>
+
+                    </Grid>
+                </TabItem>
+                
+            </TabControl>
+        </ScrollViewer>
+        
+    </Grid>
+
+</Window>
